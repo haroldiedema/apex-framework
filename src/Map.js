@@ -12,7 +12,8 @@ function Map (items)
         _is_frozen,
         _is_locked = {}, // Hash-maps are faster than arrays for lookups.
         _merge,
-        _clone;
+        _clone,
+        _prepend;
 
     // Hydrate the _data array if an object was passed to the constructor.
     items = items || {};
@@ -82,6 +83,24 @@ function Map (items)
             return clone;
         } else {
             return source;
+        }
+    };
+
+    /**
+     * @param {Object} target
+     * @param {Object} object
+     * @private
+     */
+    _prepend = function (target, object)
+    {
+        for (let key in object) {
+            if (object.hasOwnProperty(key) === false) continue;
+            if (typeof target[key] === 'undefined') {
+                target[key] = object[key];
+            } else {
+                // Recursive merge.
+                _prepend(target[key], object[key]);
+            }
         }
     };
 
@@ -203,6 +222,20 @@ function Map (items)
                 throw new Error('Argument #1 of Map.merge must be an object, ' + typeof object + ' given.');
             }
             _merge(_data, object);
+        },
+
+        /**
+         * Merges the given object into this map, without overwriting any existing values.
+         *
+         * @param {Object} object
+         */
+        prepend: function (object)
+        {
+            if (_is_frozen === true) {
+                throw new Error('Modifying a frozen map is prohibited.');
+            }
+
+            _prepend(_data, object);
         },
 
         /**
