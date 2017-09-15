@@ -35,7 +35,7 @@ function Container ()
 
         for(let id in data.services) {
             if (data.services.hasOwnProperty(id) === false) continue;
-            _builder.setDefinition(id, data.services[id]);
+            _builder.setDefinition(id, new Definition(data.services[id]));
         }
 
         for (let name in data.parameters) {

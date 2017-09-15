@@ -18,7 +18,8 @@ module.exports = {
     DI : {
         Container  : require('./DI/Container'),
         Extension  : require('./DI/Extension'),
-        Definition : require('./DI/Definition')
+        Definition : require('./DI/Definition'),
+        Platform   : require('./DI/Platform')
     },
 
     // Threading capabilities

@@ -49,7 +49,8 @@ let Window = function (user_config, url, callback)
         backgroundColor  : '#222222',
         hasShadow        : true,
         transparent      : false,
-        thickFrame       : false,
+        thickFrame       : true,
+        useContentSize   : true,
         vibrancy         : 'dark',
         zoomToPageWidth  : false,
         webPreferences   : {
@@ -72,6 +73,7 @@ let Window = function (user_config, url, callback)
 
     app.on('ready', () => {
         _hwnd = new BrowserWindow(config);
+        _hwnd.setMenu(null);
         _hwnd.on('ready-to-show', () => {
             _hwnd.webContents.send('message', {type: '__entryMain', data: {url: url}});
             _hwnd.show();
@@ -82,6 +84,10 @@ let Window = function (user_config, url, callback)
             }
         });
         _hwnd.loadURL('file://' + __dirname + '/Window/ApexWindow.html');
+    });
+
+    app.on('window-all-closed', () => {
+        app.quit();
     });
 };
 

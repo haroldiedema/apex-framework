@@ -18,6 +18,8 @@ Apex.IPC.onMessage('__entryMain', (data) => {
         Apex.IPC.send('profile.save', Apex.Profile.all());
     }
 
+    Apex.Platform = new Apex.DI.Platform(Apex.Profile.get('PACKAGE_ROOT'));
+
     let script = document.createElement('script');
     $.get(data.url, (js) => {
         script.innerHTML = js;

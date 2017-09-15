@@ -122,26 +122,9 @@ function Definition (config)
             } else if (typeof config.function === 'string') {
                 // Resolve the function from a string (from the global scope)
                 service = _initializer(_resolve(config.function, undefined, undefined, 'function'), _args);
-            } else if (typeof config.module === 'string') {
-                // Resolving from a module can happen in 2 ways:
-                //  1: config.function is undefined; require(...) must return a function.
-                //  2: config.function is a string; require(...) returns an object where {config.function} is the
-                //     function to instantiate from the returned object.
-                //  3: config.factory_method is a string; require(...) must return an object where
-                //     {config.factory_method} is a function that returns an object.
-                let module = require(config.module);
-
-                if (typeof module === 'function') {
-                    service = _initializer(module, _args);
-                }
-                if (typeof module === 'object' && typeof config.function === 'undefined' && config.factory === 'undefined') {
-                    if (typeof module !== 'function') {
-                        throw new Error(
-                            'The module "' + config.module + '" must return a function, got ' + typeof config.module
-                        );
-                    }
-
-                    service = _initializer(module, _args);
+            } else if (typeof config.module === 'object') {
+                if (typeof config.function === 'undefined' && typeof config.factory === 'undefined') {
+                    service = config.module;
                 } else if (typeof config.function === 'string') {
                     if (typeof module[config.function] !== 'function') {
                         throw new Error(
@@ -156,7 +139,38 @@ function Definition (config)
                         );
                     }
                     _args.shift();
-                    service = module[config.factory].apply(null, _args);
+                    service = config.module[config.factory].apply(null, _args);
+                } else {
+                    throw new Error(
+                        'Unable to determine how to instantiate service from node module "' + config.module + '".'
+                    );
+                }
+            } else if (typeof config.module === 'string') {
+                // Resolving from a module can happen in 2 ways:
+                //  1: config.function is undefined; require(...) must return a function.
+                //  2: config.function is a string; require(...) returns an object where {config.function} is the
+                //     function to instantiate from the returned object.
+                //  3: config.factory_method is a string; require(...) must return an object where
+                //     {config.factory_method} is a function that returns an object.
+                config.module = require(config.module);
+
+                if (typeof module === 'object' && typeof config.function === 'undefined' && typeof config.factory === 'undefined') {
+                    service = config.module;
+                } else if (typeof config.function === 'string') {
+                    if (typeof module[config.function] !== 'function') {
+                        throw new Error(
+                            'The function "' + config.function + '" does not exist in module "' + config.module + '.'
+                        );
+                    }
+                    service = _initializer(module[config.function], _args);
+                } else if (typeof config.factory_method === 'string') {
+                    if (typeof module[config.factory_method] !== 'function') {
+                        throw new Error(
+                            'The factory function "' + config.factory_method + '" does not exist in module "' + config.module + '.'
+                        );
+                    }
+                    _args.shift();
+                    service = config.module[config.factory].apply(null, _args);
                 } else {
                     throw new Error(
                         'Unable to determine how to instantiate service from node module "' + config.module + '".'
