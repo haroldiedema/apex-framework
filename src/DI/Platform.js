@@ -8,17 +8,20 @@
 
 const
     Container = require('./Container'),
-    Profile   = require('../Profile'),
     fs        = require('fs'),
     path      = require('path');
 
 class Platform
 {
-    constructor(base_dir)
+    /**
+     * @param {String}  base_dir
+     * @param {Profile} profile
+     */
+    constructor(base_dir, profile)
     {
         // The service container.
         this._container = new Container();
-        this._container.set('profile', Profile);
+        this._container.set('profile', profile);
 
         fs.readdirSync(base_dir).forEach((filename) => {
             let file = path.resolve(path.join(base_dir, filename)),
