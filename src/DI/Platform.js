@@ -32,9 +32,37 @@ class Platform
         });
     }
 
-    getContainer()
+    /**
+     * Returns the service with the given ID.
+     * Throws an error if the service cannot be found or could not be instantiated/loaded.
+     *
+     * @param   {String} id
+     * @returns {Object}
+     */
+    get(id)
     {
-        return this._container;
+        return this._container.get(id);
+    }
+
+    /**
+     * Sets a parameter by the given name and value.
+     *
+     * @param {String} name
+     * @param {*}      value
+     */
+    setParameter(name, value)
+    {
+        this._container.setParameter(name, value);
+    }
+
+    /**
+     * Returns a parameter value by the given name.
+     *
+     * @param {String} name
+     */
+    getParameter(name)
+    {
+        this._container.getParameter(name);
     }
 }
 
