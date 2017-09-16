@@ -7,6 +7,7 @@
 'use strict';
 
 const {app, BrowserWindow} = require('electron'),
+      path                 = require('path'),
       Map                  = require('./Map'),
       IPC                  = require('./IPC');
 
@@ -64,7 +65,8 @@ let Window = function (user_config, url, callback)
             webaudio                : true,
             plugins                 : false,
             scrollBounce            : false,
-            defaultFontSize         : '12px'
+            defaultFontSize         : '12px',
+            preload                 : path.join(__dirname, 'Window', 'ApexWindow.js'),
         }
     });
 
@@ -83,7 +85,11 @@ let Window = function (user_config, url, callback)
                 _hwnd.webContents.openDevTools();
             }
         });
-        _hwnd.loadURL('file://' + __dirname + '/Window/ApexWindow.html');
+        _hwnd.loadURL(url);
+
+        IPC.onMessage('window.requestPointerLock', () => {
+            _hwnd.webContents.executeJavaScript('document.body.requestPointerLock();', true);
+        });
     });
 
     app.on('window-all-closed', () => {

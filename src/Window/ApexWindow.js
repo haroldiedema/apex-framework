@@ -6,23 +6,41 @@
  * ----------------------------------------------------- /_*/
 'use strict';
 
+const fs = require('fs');
+
+let ready                = false,
+    ready_listener_stack = [];
+
 window.Apex = require('../apex.js');
-window.$    = require('jquery');
 
-// Load the entry script.
-Apex.IPC.onMessage('__entryMain', (data) => {
+Apex.ready = (callback) => {
+    if (ready) {
+        return callback();
+    }
+    ready_listener_stack.push(callback);
+};
 
-    Apex.Profile = new Apex.Map(Apex.IPC.send('profile.load'));
+window.addEventListener('load', ()  => {
+    Apex.Profile  = new Apex.Map(Apex.IPC.send('profile.load'));
+    Apex.Platform = new Apex.DI.Platform(Apex.Profile.get('PACKAGE_ROOT'), Apex.Profile);
+
+    $('html, body').css({
+        position: 'relative',
+        margin: 0,
+        padding: 0,
+        width: '100%',
+        height: '100%',
+        overflow: 'hidden'
+    });
+
     if (! Apex.Profile.has('userProfile')) {
         Apex.Profile.set('userProfile', require('os').userInfo());
         Apex.IPC.send('profile.save', Apex.Profile.all());
     }
 
-    Apex.Platform = new Apex.DI.Platform(Apex.Profile.get('PACKAGE_ROOT'), Apex.Profile);
-
-    let script = document.createElement('script');
-    $.get(data.url, (js) => {
-        script.innerHTML = js;
-        $('head').append(script);
+    ready = true;
+    ready_listener_stack.forEach((e) => {
+        e();
     });
+    ready_listener_stack = [];
 });
