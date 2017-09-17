@@ -97,7 +97,7 @@ function Map (items)
             if (object.hasOwnProperty(key) === false) continue;
             if (typeof target[key] === 'undefined') {
                 target[key] = object[key];
-            } else {
+            } else if (typeof object[key] === 'object' && target[key] === 'object') {
                 // Recursive merge.
                 _prepend(target[key], object[key]);
             }

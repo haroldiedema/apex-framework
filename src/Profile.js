@@ -57,7 +57,7 @@ if (IPC.isMain) {
     });
     IPC.onMessage('profile.save', (data) => {
         profile.merge(data);
-        profile.saveUserData();
+        fs.writeFileSync(file, JSON.stringify(profile.all()));
     });
 }
 
