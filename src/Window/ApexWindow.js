@@ -38,6 +38,10 @@ window.addEventListener('load', ()  => {
         Apex.IPC.send('profile.save', Apex.Profile.all());
     }
 
+    Apex.Profile.saveUserData = () => {
+        Apex.IPC.send('profile.save', Apex.Profile.all());
+    }
+
     ready = true;
     ready_listener_stack.forEach((e) => {
         e();
