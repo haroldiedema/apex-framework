@@ -11,13 +11,13 @@ if (! require('./IPC').isMain) {
 }
 
 const Map  = require('./Map'),
-      app  = require('electron').app,
-      IPC  = require('./IPC'),
-      fs   = require('fs'),
-      os   = require('os'),
-      path = require('path'),
-      dir  = app.getPath('userData'),
-      file = path.join(dir, 'profile.json');
+    app  = require('electron').app,
+    IPC  = require('./IPC'),
+    fs   = require('fs'),
+    os   = require('os'),
+    path = require('path'),
+    dir  = app.getPath('userData'),
+    file = path.join(dir, 'profile.json');
 
 let profile = new Map();
 
@@ -43,7 +43,10 @@ profile.loadUserData = function () {
     if (fs.existsSync(file) === false) {
         fs.writeFileSync(file, JSON.stringify({}));
     }
-    profile.merge(JSON.parse(fs.readFileSync(file).toString()));
+    let profile_data = JSON.parse(fs.readFileSync(file).toString());
+    if (profile_data !== null && typeof profile_data === 'object') {
+        profile.merge(profile_data);
+    }
 };
 
 profile.saveUserData = function () {
