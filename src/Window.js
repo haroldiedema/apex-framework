@@ -85,7 +85,7 @@ let Window = function (user_config, url, callback)
                 _hwnd.webContents.openDevTools();
             }
         });
-        _hwnd.loadURL(url);
+        _hwnd.loadURL('file://' + url);
 
         IPC.onMessage('window.requestPointerLock', () => {
             _hwnd.webContents.executeJavaScript('document.body.requestPointerLock();', true);
