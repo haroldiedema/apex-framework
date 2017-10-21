@@ -90,6 +90,9 @@ let Window = function (user_config, url, callback)
         IPC.onMessage('window.requestPointerLock', () => {
             _hwnd.webContents.executeJavaScript('document.body.requestPointerLock();', true);
         });
+        IPC.onMessage('window.setFullScreen', (e) => {
+            _hwnd.setFullScreen(e.state || false);
+        });
     });
 
     app.on('window-all-closed', () => {
