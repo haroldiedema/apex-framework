@@ -55,7 +55,7 @@ let Window = function (user_config, url, callback)
         vibrancy         : 'dark',
         zoomToPageWidth  : false,
         webPreferences   : {
-            devTools                : true,
+            devTools                : user_config.debug,
             nodeIntegration         : true,
             nodeIntegrationInWorker : true,
             javascript              : true,
