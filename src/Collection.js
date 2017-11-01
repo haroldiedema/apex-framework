@@ -105,7 +105,7 @@ function Collection (items)
          * value of the current item as the first argument and this collection instance as the second.
          *
          * Example:
-         *      let col = new Rise.Collection(['foo', 'bar']);
+         *      let col = new Apex.DI.Collection(['foo', 'bar']);
          *      col.each(function (value, collection) {
          *          if (value === 'foo') {
          *              collection.remove(value);
@@ -117,7 +117,7 @@ function Collection (items)
         each: function (callback)
         {
             if (typeof callback !== 'function') {
-                throw new TypeError('Rise.Collection.each requires a function, got ' + typeof callback + ' instead.');
+                throw new TypeError('Apex.DI.Collection.each requires a function, got ' + typeof callback + ' instead.');
             }
 
             for (let i = 0; i < _data.length; i++) {

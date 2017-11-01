@@ -17,11 +17,26 @@ function Container ()
         _loading     = new Collection(),
         _services    = new Map(),
         _parameters  = new Map(),
-        _definitions = new Map();
+        _definitions = new Map(),
+        _compiled    = false,
+        _compiling   = false;
 
     // Public API & Builder API
     let _api     = {},
         _builder = {};
+
+    /**
+     * Compiles the container.
+     */
+    let _compile = function () {
+        if (_compiling) {
+            throw new Error('You cannot fetch a service from a container that is in the process of being compiled.');
+        }
+        _compiling = true;
+        _extensions.each(function (extension) {
+            extension.compile(this);
+        }.bind(this));
+    }.bind(_api);
 
     /**
      * Imports the given data structure into this container.
@@ -32,6 +47,7 @@ function Container ()
     {
         data.services   = data.services   || {};
         data.parameters = data.parameters || {};
+        data.extensions = data.extensions || [];
 
         for(let id in data.services) {
             if (data.services.hasOwnProperty(id) === false) continue;
@@ -42,6 +58,13 @@ function Container ()
             if (data.parameters.hasOwnProperty(name) === false) continue;
             _parameters.set(name, data.parameters[name]);
         }
+
+        data.extensions.forEach((extension) => {
+            if (typeof extension.compile !== 'function') {
+                throw new Error('Extension "' + extension.constructor.name + '" must implement a compile() function.');
+            }
+            _extensions.add(new Extension(extension.compile));
+        });
     };
 
     /**
@@ -77,6 +100,26 @@ function Container ()
     };
 
     /**
+     * Returns a list of service ID's that are tagged by the given name.
+     *
+     * @param name
+     * @returns {Array}
+     */
+    _api.findTaggedServiceIds = function (name)
+    {
+        // console.log(_definitions.all());
+        let tags, service_ids = [];
+        Object.keys(_definitions.all()).forEach((id) => {
+            tags = _definitions.get(id).getTags().all();
+            tags.forEach((tag) => {
+                if (tag.name === name) service_ids.push(id);
+            });
+        });
+
+        return service_ids;
+    }
+
+    /**
      * Sets a service.
      *
      * @param {String} id      The service identifier
@@ -95,6 +138,11 @@ function Container ()
      */
     _api.get = function (id)
     {
+        if (! _compiled) {
+            _compiled = true;
+            _compile();
+        }
+
         // Circular reference detection.
         if (_loading.contains(id)) {
             throw new Error(

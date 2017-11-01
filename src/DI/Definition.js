@@ -225,6 +225,26 @@ function Definition (config)
         setArguments: function (args)
         {
             _arguments = new Collection(args);
+        },
+
+        /**
+         * Returns the arguments collection for this service definition.
+         *
+         * @returns {Collection}
+         */
+        getArguments: function ()
+        {
+            return _arguments;
+        },
+
+        /**
+         * Returns the defined tags.
+         *
+         * @returns {Collection}
+         */
+        getTags: function ()
+        {
+            return _tags;
         }
     };
 }

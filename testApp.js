@@ -1,24 +1,32 @@
-console.log('Even testen.');
+const Container = require ('./src/DI/Container'),
+      Extension = require ('./src/DI/Extension');
 
-$('body').html('Yeey, we hebben jQuery.');
 
-let thread = new Apex.Threading.Thread((onMessage, postMessage) => {
+class Compl
+{
+    compile (container)
+    {
+        console.log('Compl ding.');
+        console.log(container.findTaggedServiceIds('foo'));
+    }
+}
 
-    let to_add = [];
+container = new Container();
 
-    onMessage((data) => {
-        console.log(data);
-        to_add = data;
-        let r = 0;
-        to_add.forEach((i) => {
-            r += i;
-        });
-        postMessage(r);
-    });
+container.builder.import({
+    parameters: {
+
+    },
+    services: {
+        'foo.bar': {
+            function: function (a, b) { console.log('foo.bar', a, b); },
+            tags: [{ name: 'foo' }],
+            arguments: [1]
+        }
+    },
+    extensions: [
+        new Compl()
+    ]
 });
 
-thread.start();
-thread.send([1, 2]);
-thread.onMessage((data) => {
-    console.log("FROM THREAD: ", data);
-});
+container.get('foo.bar');
